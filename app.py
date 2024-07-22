@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_migrate import Migrate
 from model import db, Book, Author, Issuer, Issue, Inventory
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your_secret_key'  # Replace with your secret key
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -14,8 +13,8 @@ migrate = Migrate(app, db)
 @app.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
-        search_text = request.form.get('searchInput', '').strip()
-        search_issue_id = request.form.get('searchIssueID')  # Get issue ID from form input
+        search_text = request.form.get('searchInput', '').strip() # Getting title text to search from form input
+        search_issue_id = request.form.get('searchIssueID')  # Getting issue ID from form input
         if search_text:
             inventory_items = filter_inventory_by_title(search_text)
         elif search_issue_id:
@@ -41,8 +40,6 @@ def filter_inventory_by_title(search_text):
 def filter_inventory_by_issue_id(issue_id):
     # Query issues based on issue_id
     issues = Issue.query.filter_by(issue_id=issue_id).all()
-
-    # Extract inventory items from issues
     inventory_items = [issue.inventory for issue in issues]
 
     return inventory_items
@@ -77,12 +74,11 @@ def issue_book_form(inventory_id):
             flash('Book issued successfully!', 'success')
             return redirect(url_for('home'))
 
-        # Render issue form
         return render_template("issue_form.html", inventory_id=inventory_id)
     else:
         flash('Book is currently not available for issuing.', 'danger')
         return redirect(url_for('home'))
-from datetime import date  # Import date module
+
 
 @app.route("/return/<int:issue_id>", methods=['GET', 'POST'])
 def return_book_form(issue_id):
@@ -110,7 +106,7 @@ def return_book_form(issue_id):
             flash('Book returned successfully!', 'success')
             return redirect(url_for('home'))
 
-        # Render return form with calculated fine amount and issuer details
+        # Rendering return form with calculated fine amount and issuer details
         return render_template("return_form.html", issue=issue, fine_amount=fine_amount, issuer=issuer)
 
     else:
@@ -124,9 +120,9 @@ def prepare_inventory_data(inventory_items):
         book = Book.query.get(item.book_id)
         author = Author.query.get(book.author_id) if book else None
 
-        # Get active issue (if any) for the current inventory item
+        # Getting active issue (if any) for the current inventory item
         active_issue = Issue.query.filter_by(inventory_id=item.inventory_id, is_returned=False).first()
-        issue_id = active_issue.issue_id if active_issue else None  # Get issue_id if active_issue exists
+        issue_id = active_issue.issue_id if active_issue else None  # Getting issue_id if active_issue exists
 
         if book:
             data = {
@@ -134,8 +130,8 @@ def prepare_inventory_data(inventory_items):
                 'title': book.title,
                 'author': author.name if author else 'Unknown',
                 'is_available': item.is_available,
-                'active_issue': active_issue,  # Include active issue in inventory data
-                'issue_id': issue_id  # Store issue_id or None
+                'active_issue': active_issue,  # Including active issue in inventory data
+                'issue_id': issue_id  # Storing issue_id or None
             }
             inventory_data.append(data)
 
