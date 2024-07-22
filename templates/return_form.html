@@ -1,0 +1,23 @@
+{% extends "base.html" %} {% block body %}
+<div class="container">
+  <h2>Return Book</h2>
+  <p><strong>Issue Details:</strong></p>
+  <p>Issue ID: {{ issue.issue_id }}</p>
+  <p>Inventory ID: {{ issue.inventory_id }}</p>
+  <p>Due Date: {{ issue.due_date }}</p>
+
+  <p><strong>Issuer Details:</strong></p>
+  <p>Name: {{ issuer.name }}</p>
+  <p>Email: {{ issuer.email }}</p>
+  <p>Phone Number: {{ issuer.phone_number }}</p>
+
+  <form method="post">
+    {% if fine_amount > 0 %}
+    <div class="alert alert-warning" role="alert">
+      Fine Applicable: Rs. {{ fine_amount }}
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Return Book</button>
+  </form>
+</div>
+{% endblock %}

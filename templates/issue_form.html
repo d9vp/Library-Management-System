@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="border-left p-3">
+  <h2>Issue Book</h2>
+  <form method="post">
+    <input type="hidden" name="inventory_id" value="{{ inventory_id }}">
+    <div class="form-group">
+      <label for="issuer_id">Issuer ID:</label>
+      <input type="text" class="form-control" id="issuer_id" name="issuer_id" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+{% endblock %}

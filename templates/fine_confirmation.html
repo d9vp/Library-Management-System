@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block body %}
+<div class="container">
+  <h2>Return Book - Fine Confirmation</h2>
+  <p><strong>Issue Details:</strong></p>
+  <p>Issue ID: {{ issue.issue_id }}</p>
+  <p>Inventory ID: {{ issue.inventory_id }}</p>
+  <p>Due Date: {{ issue.due_date }}</p>
+
+  <p><strong>Issuer Details:</strong></p>
+  <p>Name: {{ issuer.name }}</p>
+  <p>Email: {{ issuer.email }}</p>
+  <p>Phone Number: {{ issuer.phone_number }}</p>
+
+  <p><strong>Fine Details:</strong></p>
+  <p>Return Date: {{ return_date }}</p>
+  <p>Fine Amount: Rs. {{ fine_amount }}</p>
+
+  <form method="post">
+    <input type="hidden" name="return_date" value="{{ return_date }}" />
+    <input type="hidden" name="fine_amount" value="{{ fine_amount }}" />
+    <button type="submit" class="btn btn-primary">
+      Confirm Return with Fine
+    </button>
+  </form>
+</div>
+{% endblock %}
