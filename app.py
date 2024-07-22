@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your_secret_key'  # Replace with your secret key
 
 db.init_app(app)
@@ -15,16 +15,39 @@ migrate = Migrate(app, db)
 def home():
     if request.method == 'POST':
         search_text = request.form.get('searchInput', '').strip()
+        search_issue_id = request.form.get('searchIssueID')  # Get issue ID from form input
         if search_text:
             inventory_items = filter_inventory_by_title(search_text)
+        elif search_issue_id:
+            inventory_items = filter_inventory_by_issue_id(int(search_issue_id))
         else:
             inventory_items = Inventory.query.all()
     else:
         inventory_items = Inventory.query.all()
 
     inventory_data = prepare_inventory_data(inventory_items)
+    now = datetime.now().date()  # Get current date
 
-    return render_template("index.html", inventory=inventory_data)
+    return render_template("index.html", inventory=inventory_data, now=now)
+
+def filter_inventory_by_title(search_text):
+    # Filter inventory items where book title contains search_text
+    filtered_inventory = Inventory.query \
+        .join(Book) \
+        .filter(Book.title.ilike(f"%{search_text}%")) \
+        .all()
+    return filtered_inventory
+
+def filter_inventory_by_issue_id(issue_id):
+    # Query issues based on issue_id
+    issues = Issue.query.filter_by(issue_id=issue_id).all()
+
+    # Extract inventory items from issues
+    inventory_items = [issue.inventory for issue in issues]
+
+    return inventory_items
+
+
 
 @app.route("/issue/<int:inventory_id>", methods=['GET', 'POST'])
 def issue_book_form(inventory_id):
@@ -94,17 +117,6 @@ def return_book_form(issue_id):
         flash('Book is already available.', 'danger')
         return redirect(url_for('home'))
 
-
-
-
-
-def filter_inventory_by_title(search_text):
-    # Filter inventory items where book title contains search_text
-    filtered_inventory = Inventory.query \
-        .join(Book) \
-        .filter(Book.title.ilike(f"%{search_text}%")) \
-        .all()
-    return filtered_inventory
 
 def prepare_inventory_data(inventory_items):
     inventory_data = []

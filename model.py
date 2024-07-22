@@ -49,7 +49,7 @@ class Inventory(db.Model):
         return f"{self.inventory_id}, {self.book_id}, {self.shelf_location}, {self.is_available}"
     
 class Issue(db.Model) :
-    __tablename_ ='issue'
+    __tablename__ ='issue'
     issue_id=db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     inventory_id = db.Column(db.Integer, db.ForeignKey('inventory.inventory_id'))
     inventory = relationship('Inventory', backref=backref('issues', uselist=True))
